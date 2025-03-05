@@ -1,23 +1,21 @@
-# -*- coding: utf-8 -*-
-
-import joblib  # Menggunakan joblib untuk memuat model .sav
+from flask import Flask, request, jsonify
 import numpy as np
-from flask import Flask, request, jsonify, render_template
+import joblib
 from pymongo import MongoClient
-import os
+from flask_cors import CORS  # Tambahkan CORS
 
-# Inisialisasi Flask
 app = Flask(__name__)
+CORS(app)  # Aktifkan CORS untuk semua rute
 
-# Load model yang sudah disimpan
+# Load model
 try:
-    model = joblib.load('diabetes_model.sav')  # Pastikan path ke model benar
+    model = joblib.load('diabetes_model.sav')
     print("Model berhasil dimuat!")
 except Exception as e:
     print(f"Gagal memuat model: {e}")
     model = None
 
-# Koneksi ke MongoDB
+# Koneksi MongoDB
 try:
     client = MongoClient('mongodb://localhost:27017/')
     db = client['diabetes_db']
@@ -27,46 +25,44 @@ except Exception as e:
     print(f"Gagal terhubung ke MongoDB: {e}")
     client = None
 
-# Route untuk halaman utama
-@app.route('/')
-def home():
-    return render_template('index.html')
-
-# Route untuk prediksi
 @app.route('/predict', methods=['POST'])
 def predict():
     if model is None:
-        return render_template('index.html', prediction_text='Model tidak tersedia.')
+        return jsonify({'error': 'Model tidak tersedia'}), 500
     if client is None:
-        return render_template('index.html', prediction_text='MongoDB tidak tersedia.')
+        return jsonify({'error': 'MongoDB tidak tersedia'}), 500
 
-    # Ambil data dari form
-    features = [float(x) for x in request.form.values()]
-    final_features = [np.array(features)]
-
-    # Lakukan prediksi
     try:
+        # Ambil data dari request JSON
+        data = request.json
+        features = [
+            float(data.get('kehamilan', 0)), 
+            float(data.get('glukosa', 0)), 
+            float(data.get('tekanan_darah', 0)), 
+            float(data.get('ketebalan_kulit', 0)), 
+            float(data.get('insulin', 0)), 
+            float(data.get('bmi', 0)), 
+            float(data.get('riwayat_diabetes', 0)), 
+            float(data.get('usia', 0))
+        ]
+        final_features = [np.array(features)]
+        
+        # Prediksi
         prediction = model.predict(final_features)
-        output = prediction[0]
-    except Exception as e:
-        return render_template('index.html', prediction_text=f'Gagal melakukan prediksi: {e}')
+        output = int(prediction[0])
 
-    # Simpan hasil prediksi ke MongoDB
-    try:
+        # Simpan ke MongoDB
         prediction_data = {
             'input_data': features,
-            'prediction_result': int(output)
+            'prediction_result': output
         }
         collection.insert_one(prediction_data)
+
+        # Kirim response
+        return jsonify({'prediction': output})
+    
     except Exception as e:
-        return render_template('index.html', prediction_text=f'Gagal menyimpan hasil prediksi ke MongoDB: {e}')
+        return jsonify({'error': f'Gagal melakukan prediksi: {str(e)}'}), 500
 
-    # Tampilkan hasil prediksi
-    if output == 1:
-        return render_template('index.html', prediction_text='Menderita Diabetes')
-    else:
-        return render_template('index.html', prediction_text='Tidak Menderita Diabetes')
-
-# Jalankan aplikasi Flask
 if __name__ == '__main__':
     app.run(debug=True)
