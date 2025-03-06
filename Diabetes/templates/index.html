@@ -1,35 +1,41 @@
 <!doctype html>
 <html>
+   <head>
+      <title>Prediksi Diabetes</title>
+   </head>
    <body>
-      <h1>Diabetes Prediction</h1>
+      <h1>Prediksi Diabetes</h1>
       <form action="{{ url_for('predict') }}" method="post">
-         <label>Pregnancies</label>
-         <input type="text" name="Pregnancies" required>
+         <label>Kehamilan</label>
+         <input type="text" name="kehamilan" required>
          <br>
-         <label>Glucose</label>
-         <input type="text" name="Glucose" required>
+         <label>Glukosa</label>
+         <input type="text" name="glukosa" required>
          <br>
-         <label>BloodPressure</label>
-         <input type="text" name="BloodPressure" required>
+         <label>Tekanan Darah</label>
+         <input type="text" name="tekanan_darah" required>
          <br>
-         <label>SkinThickness</label>
-         <input type="text" name="SkinThickness" required>
+         <label>Ketebalan Kulit</label>
+         <input type="text" name="ketebalan_kulit" required>
          <br>
          <label>Insulin</label>
-         <input type="text" name="Insulin" required>
+         <input type="text" name="insulin" required>
          <br>
          <label>BMI</label>
-         <input type="text" name="BMI" required>
+         <input type="text" name="bmi" required>
          <br>
-         <label>DiabetesPedigreeFunction</label>
-         <input type="text" name="DiabetesPedigreeFunction" required>
+         <label>Riwayat Diabetes</label>
+         <input type="text" name="riwayat_diabetes" required>
          <br>
-         <label>Age</label>
-         <input type="text" name="Age" required>
+         <label>Usia</label>
+         <input type="text" name="usia" required>
          <br>
-         <button type="submit">Predict</button>
+         <button type="submit">Prediksi</button>
       </form>
       
-      <h2>{{ prediction_text }}</h2>
+      <!-- Menampilkan hasil prediksi -->
+      {% if prediction_text %}
+         <h2>{{ prediction_text }}</h2>
+      {% endif %}
    </body>
 </html>

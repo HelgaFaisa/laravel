@@ -9,28 +9,28 @@
     <h1>Prediksi Diabetes</h1>
     <form id="predictForm">
         <label>Kehamilan</label>
-        <input type="number" name="kehamilan" required>
+        <input type="number" name="kehamilan" min="0" required>
         <br>
         <label>Glukosa</label>
-        <input type="number" name="glukosa" required>
+        <input type="number" step="any" name="glukosa" min="0" required>
         <br>
         <label>Tekanan Darah</label>
-        <input type="number" name="tekanan_darah" required>
+        <input type="number" name="tekanan_darah" min="0" required>
         <br>
         <label>Ketebalan Kulit</label>
-        <input type="number" name="ketebalan_kulit" required>
+        <input type="number" name="ketebalan_kulit" min="0" required>
         <br>
         <label>Insulin</label>
-        <input type="number" name="insulin" required>
+        <input type="number" name="insulin" min="0" required>
         <br>
         <label>BMI</label>
-        <input type="number" step="0.1" name="bmi" required>
+        <input type="number" step="any" name="bmi" min="0" required>
         <br>
         <label>Riwayat Diabetes Keluarga</label>
-        <input type="number" step="0.01" name="riwayat_diabetes" required>
+        <input type="number" step="any" name="riwayat_diabetes" min="0" required>
         <br>
         <label>Usia</label>
-        <input type="number" name="usia" required>
+        <input type="number" name="usia" min="0" required>
         <br>
         <button type="submit">Prediksi</button>
     </form>
@@ -44,15 +44,21 @@
 
             // Ambil data dari form
             let inputData = {
-                kehamilan: parseFloat($('input[name="kehamilan"]').val()),
-                glukosa: parseFloat($('input[name="glukosa"]').val()),
-                tekanan_darah: parseFloat($('input[name="tekanan_darah"]').val()),
-                ketebalan_kulit: parseFloat($('input[name="ketebalan_kulit"]').val()),
-                insulin: parseFloat($('input[name="insulin"]').val()),
-                bmi: parseFloat($('input[name="bmi"]').val()),
-                riwayat_diabetes: parseFloat($('input[name="riwayat_diabetes"]').val()),
-                usia: parseFloat($('input[name="usia"]').val()),
+                kehamilan: parseFloat($('input[name="kehamilan"]').val()) || 0,
+                glukosa: parseFloat($('input[name="glukosa"]').val()) || 0,
+                tekanan_darah: parseFloat($('input[name="tekanan_darah"]').val()) || 0,
+                ketebalan_kulit: parseFloat($('input[name="ketebalan_kulit"]').val()) || 0,
+                insulin: parseFloat($('input[name="insulin"]').val()) || 0,
+                bmi: parseFloat($('input[name="bmi"]').val()) || 0,
+                riwayat_diabetes: parseFloat($('input[name="riwayat_diabetes"]').val()) || 0,
+                usia: parseFloat($('input[name="usia"]').val()) || 0,
             };
+
+            // Validasi data sebelum dikirim
+            if (Object.values(inputData).some(value => isNaN(value) || value < 0)) {
+                alert("Harap isi semua data dengan angka yang valid.");
+                return;
+            }
 
             // Kirim data ke API Flask
             $.ajax({

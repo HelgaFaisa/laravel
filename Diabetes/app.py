@@ -1,19 +1,21 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import numpy as np
 import joblib
 from pymongo import MongoClient
-from flask_cors import CORS  # Tambahkan CORS
+from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)  # Aktifkan CORS untuk semua rute
+CORS(app)
 
-# Load model
+# Load model and scaler
 try:
-    model = joblib.load('diabetes_model.sav')
-    print("Model berhasil dimuat!")
+    model = joblib.load('diabetes_best_model.sav')  # Gunakan model terbaik
+    scaler = joblib.load('diabetes_scaler.sav')  # Gunakan scaler yang sesuai
+    print("Model dan scaler berhasil dimuat!")
 except Exception as e:
-    print(f"Gagal memuat model: {e}")
+    print(f"Gagal memuat model atau scaler: {e}")
     model = None
+    scaler = None
 
 # Koneksi MongoDB
 try:
@@ -25,16 +27,29 @@ except Exception as e:
     print(f"Gagal terhubung ke MongoDB: {e}")
     client = None
 
-@app.route('/predict', methods=['POST'])
+@app.route('/')
+def home():
+    # Render halaman HTML utama
+    return render_template('index.html')
+
+@app.route('/predict', methods=['GET', 'POST'])
 def predict():
-    if model is None:
-        return jsonify({'error': 'Model tidak tersedia'}), 500
+    if model is None or scaler is None:
+        return jsonify({'error': 'Model atau scaler tidak tersedia'}), 500
     if client is None:
         return jsonify({'error': 'MongoDB tidak tersedia'}), 500
 
     try:
-        # Ambil data dari request JSON
-        data = request.json
+        # Ambil data dari request JSON (untuk API) atau form (untuk HTML)
+        if request.method == 'POST':
+            if request.is_json:
+                data = request.json  # Ambil data dari JSON
+            else:
+                data = request.form  # Ambil data dari form HTML
+        else:
+            data = request.args  # Ambil data dari query parameters (untuk GET)
+
+        # Validasi data
         features = [
             float(data.get('kehamilan', 0)), 
             float(data.get('glukosa', 0)), 
@@ -45,7 +60,16 @@ def predict():
             float(data.get('riwayat_diabetes', 0)), 
             float(data.get('usia', 0))
         ]
-        final_features = [np.array(features)]
+
+        # Log data sebelum normalisasi
+        print("Data sebelum normalisasi:", features)
+
+        # Normalisasi data input menggunakan scaler
+        final_features = np.array(features).reshape(1, -1)
+        final_features = scaler.transform(final_features)
+
+        # Log data setelah normalisasi
+        print("Data setelah normalisasi:", final_features)
         
         # Prediksi
         prediction = model.predict(final_features)
@@ -56,10 +80,17 @@ def predict():
             'input_data': features,
             'prediction_result': output
         }
+
+        # Log data yang disimpan ke MongoDB
+        print("Data yang disimpan ke MongoDB:", prediction_data)
         collection.insert_one(prediction_data)
 
         # Kirim response
-        return jsonify({'prediction': output})
+        if request.method == 'POST':
+            return jsonify({'prediction': output})
+        else:
+            # Jika method GET, render hasil prediksi di halaman HTML
+            return render_template('index.html', prediction_text=f'Hasil Prediksi: {output}')
     
     except Exception as e:
         return jsonify({'error': f'Gagal melakukan prediksi: {str(e)}'}), 500
