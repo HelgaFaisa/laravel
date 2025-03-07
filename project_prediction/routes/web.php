@@ -31,3 +31,21 @@ Route::post('/api/diabetes/predict', function (Request $request) {
     
     return response()->json(['error' => 'Gagal menghubungi Flask API'], 500);
 });
+
+// Layouts
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->name('dashboard');
+
+Route::get('/manajemen-user/admin', function () {
+    return view('admin.index');
+})->name('admin.index');
+
+Route::get('/manajemen-user/pengguna', function () {
+    return view('pengguna.index');
+})->name('pengguna.index');
+
+// Menampilkan halaman prediksi
+Route::get('/predict', function () {
+    return view('predict');
+})->name('predict.index'); // Tambahkan nama route di sini

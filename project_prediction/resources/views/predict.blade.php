@@ -1,44 +1,67 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prediksi Diabetes</title>
-</head>
-<body>
-    <h1>Prediksi Diabetes</h1>
-    <form id="predictForm">
-        <label>Kehamilan</label>
-        <input type="number" name="kehamilan" min="0" required>
-        <br>
-        <label>Glukosa</label>
-        <input type="number" step="any" name="glukosa" min="0" required>
-        <br>
-        <label>Tekanan Darah</label>
-        <input type="number" name="tekanan_darah" min="0" required>
-        <br>
-        <label>Ketebalan Kulit</label>
-        <input type="number" name="ketebalan_kulit" min="0" required>
-        <br>
-        <label>Insulin</label>
-        <input type="number" name="insulin" min="0" required>
-        <br>
-        <label>BMI</label>
-        <input type="number" step="any" name="bmi" min="0" required>
-        <br>
-        <label>Riwayat Diabetes Keluarga</label>
-        <input type="number" step="any" name="riwayat_diabetes" min="0" required>
-        <br>
-        <label>Usia</label>
-        <input type="number" name="usia" min="0" required>
-        <br>
-        <button type="submit">Prediksi</button>
-    </form>
+@extends('layouts.app')
 
-    <h2 id="predictionResult"></h2>
+@section('title', 'Prediksi Diabetes')
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
+@section('content')
+<div class="col-md-12">
+    <div class="card">
+        <div class="card-header">
+            <h5>Prediksi Diabetes</h5>
+        </div>
+        <div class="card-body">
+            <form id="predictForm" class="mt-4">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Kehamilan</label>
+                            <input type="number" class="form-control" name="kehamilan" min="0" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Glukosa</label>
+                            <input type="number" class="form-control" step="any" name="glukosa" min="0" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tekanan Darah</label>
+                            <input type="number" class="form-control" name="tekanan_darah" min="0" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Ketebalan Kulit</label>
+                            <input type="number" class="form-control" name="ketebalan_kulit" min="0" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Insulin</label>
+                            <input type="number" class="form-control" name="insulin" min="0" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">BMI</label>
+                            <input type="number" class="form-control" step="any" name="bmi" min="0" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Riwayat Diabetes Keluarga</label>
+                            <input type="number" class="form-control" step="any" name="riwayat_diabetes" min="0" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Usia</label>
+                            <input type="number" class="form-control" name="usia" min="0" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Prediksi</button>
+                </div>
+            </form>
+            <h3 class="text-center mt-4 text-success" id="predictionResult"></h3>
+        </div>
+    </div>
+</div>
+@endsection
+
+@section('scripts')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
         $('#predictForm').on('submit', function(e) {
             e.preventDefault();
 
@@ -72,6 +95,9 @@
                     } else {
                         $('#predictionResult').text('Pasien tidak menderita diabetes.');
                     }
+
+                    // Kosongkan form setelah sukses
+                    $('#predictForm')[0].reset();
                 },
                 error: function(error) {
                     console.error(error);
@@ -79,6 +105,6 @@
                 }
             });
         });
-    </script>
-</body>
-</html>
+    });
+</script>
+@endsection

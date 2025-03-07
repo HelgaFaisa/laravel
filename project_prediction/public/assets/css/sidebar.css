@@ -1,0 +1,49 @@
+/* File: public/assets/css/sidebar.css */
+
+/* Pastikan sidebar menempel di sisi kiri */
+.pcoded-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 250px; /* Sesuaikan lebar sidebar */
+    z-index: 1000;
+    background-color: #fff; /* Sesuaikan warna background */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Tambahkan shadow jika diperlukan */
+    transition: all 0.3s ease; /* Animasi untuk menggeser sidebar */
+}
+
+/* Pastikan konten utama tidak tertutup sidebar */
+.pcoded-main-container {
+    margin-left: 250px; /* Sesuaikan dengan lebar sidebar */
+    padding: 20px;
+    transition: all 0.3s ease; /* Animasi untuk menggeser konten */
+}
+
+/* Ketika sidebar disembunyikan */
+.pcoded-navbar.menu-collapsed {
+    width: 80px; /* Lebar sidebar saat collapsed */
+}
+
+.pcoded-main-container.menu-collapsed {
+    margin-left: 80px; /* Sesuaikan dengan lebar sidebar saat collapsed */
+}
+
+/* Pastikan elemen header tidak tertutup */
+.page-header {
+    z-index: 999; /* Pastikan header berada di atas elemen lain */
+    background-color: #fff; /* Sesuaikan warna background */
+    padding: 15px; /* Tambahkan padding jika diperlukan */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Tambahkan shadow untuk efek visual */
+}
+
+/* Responsif: Sembunyikan sidebar di layar kecil */
+@media (max-width: 768px) {
+    .pcoded-navbar {
+        width: 0;
+        overflow: hidden;
+    }
+    .pcoded-main-container {
+        margin-left: 0;
+    }
+}
